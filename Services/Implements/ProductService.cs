@@ -57,7 +57,6 @@ namespace Source.Services.Implements
             return new ProductModel(entity);
         }
 
-        [Obsolete]
         public int Create(ProductInputModel product)
         {
             var category = _context.Category.FirstOrDefault(x => x.Id == product.CategoryId);
@@ -65,15 +64,7 @@ namespace Source.Services.Implements
 
             var currentDate = DateTime.UtcNow;
 
-            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Images");
-            if (!Directory.Exists(uploadsFolder))
-            {
-                Directory.CreateDirectory(uploadsFolder);
-            }
-
             var entity = new Product();
-            if (product.Image != null) 
-                entity.ImageUrl = FileUploadHelper.UploadImage(product.Image);
             entity.Name = product.Name;
             entity.Description = product.Description;
             entity.Singer = product.Singer;
@@ -82,6 +73,9 @@ namespace Source.Services.Implements
             entity.FileSize = product.File.Length;
             entity.Description = product.Description;
             entity.Type = product.File.ContentType;
+
+            if (entity.Type.Equals("video/mp4"))
+                entity.ImageUrl = FileUploadHelper.GetImage(entity.FileUrl, product.File.FileName);
 
             var tagLibFile = TagLib.File.Create(entity.FileUrl);
             entity.Duration = tagLibFile.Properties.Duration.TotalSeconds;
@@ -118,9 +112,6 @@ namespace Source.Services.Implements
                     System.IO.File.Delete(entity.FileUrl);
             }
             
-            if (product.Image != null) 
-                entity.ImageUrl = FileUploadHelper.UploadImage(product.Image);
-
             entity.Name = product.Name;
             entity.Description = product.Description;
             entity.Singer = product.Singer;
@@ -129,6 +120,9 @@ namespace Source.Services.Implements
             entity.FileSize = product.File.Length;
             entity.Description = product.Description;
             entity.Type = product.File.ContentType;
+
+            if (entity.Type.Equals("video/mp4"))
+                entity.ImageUrl = FileUploadHelper.GetImage(entity.FileUrl, product.File.FileName);
 
             var tagLibFile = TagLib.File.Create(entity.FileUrl);
             entity.Duration = tagLibFile.Properties.Duration.TotalSeconds;

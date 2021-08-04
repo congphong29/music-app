@@ -1,6 +1,8 @@
 using System;
 using System.Drawing;
 using System.IO;
+using MediaToolkit.Services;
+using MediaToolkit.Tasks;
 using Microsoft.AspNetCore.Http;
 
 namespace Source.Middleware
@@ -23,6 +25,7 @@ namespace Source.Middleware
 
             return filePath;
         }
+
         public static string UploadThumbnailImage(IFormFile file)
         {
             var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Images");
@@ -70,6 +73,22 @@ namespace Source.Middleware
             {
                 return null;
             }
+        }
+
+        public static string GetImage(string videoUrl, string fileName)
+        {
+            var uniqueFileName = Guid.NewGuid() + "_" + fileName.Split(".")[0] + ".png";
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+            var ffmpegPath = Path.Combine(uploadsFolder, "Files", "ffmpeg.exe");
+            var imagePath = Path.Combine(uploadsFolder, "Images", uniqueFileName);
+
+            var mediaToolkitService = MediaToolkitService.CreateInstance(ffmpegPath);
+            var metadataTask = new FfTaskGetMetadata(videoUrl);
+            var metadata = mediaToolkitService.ExecuteAsync(metadataTask).Result;
+
+            var thumbTask = new FfTaskSaveThumbnail(videoUrl, imagePath, TimeSpan.FromSeconds(1));
+            mediaToolkitService.ExecuteAsync(thumbTask);
+            return imagePath;
         }
     }
 }

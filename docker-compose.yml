@@ -1,0 +1,26 @@
+version: '3.0'
+
+services: 
+    database:
+        image: mysql:5.7
+        environment: 
+                MYSQL_RANDOM_ROOT_PASSWORD: 1
+                MYSQL_DATABASE: music
+                MYSQL_USER: user1
+                MYSQL_PASSWORD: 123456 
+        volumes:
+        - root/apps/db/:/var/lib/mysql
+        restart: always
+        ports: 
+         - "3306:3306"
+    musicbackedapp:
+        depends_on: 
+           - database
+        image: akakshuki/musicapp
+        build: 
+            context: .
+        ports: 
+            - "5000:5000"
+        volumes: 
+           - root/apps/music_backend/:/wwwroot/Files/
+        

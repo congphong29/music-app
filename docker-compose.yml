@@ -9,10 +9,9 @@ services:
                 MYSQL_USER: user1
                 MYSQL_PASSWORD: 123456 
         volumes:
-        - root/apps/db/:/var/lib/mysql
+        - /root/apps/db/:/var/lib/mysql
         restart: always
-        ports: 
-         - "3306:3306"
+      
     musicbackedapp:
         depends_on: 
            - database
@@ -20,7 +19,7 @@ services:
         build: 
             context: .
         ports: 
-            - "5000:5000"
+            - "0.0.0.0:8088:80"
         volumes: 
-           - root/apps/music_backend/:/wwwroot/Files/
+           - /root/apps/music_backend/:/wwwroot/Files/
         

@@ -14,4 +14,5 @@ RUN dotnet publish -c Release -o out
 FROM mcr.microsoft.com/dotnet/aspnet:5.0
 WORKDIR /app
 COPY --from=build-env /app/out .
-ENTRYPOINT ["dotnet", "Source.dll"]
+EXPOSE 5000
+ENTRYPOINT ["dotnet","Source.dll", "--server.urls", "https://+:5000"]
